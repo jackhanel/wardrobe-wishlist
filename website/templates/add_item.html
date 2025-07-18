@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add a New Item</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+    <div class="max-w-xl mx-auto px-4 py-10">
+        <h1 class="text-2xl font-bold mb-6 text-center">Add a New Item</h1>
+
+        <!-- Initial URL-only form -->
+        <div class="bg-white p-6 rounded-2xl shadow space-y-4">
+            <div>
+                <label for="product-url" class="block text-sm font-medium">Product URL *</label>
+                <input type="url" id="product-url" required
+                    class="mt-1 w-full rounded-xl border border-gray-300 shadow-sm focus:ring-black focus:border-black bg-white text-gray-800" />
+            </div>
+            <div class="flex justify-end">
+                <button onclick="scrapeProductInfo()" type="button"
+                    class="bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition">
+                    Scrape Info
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrape error banner (hidden by default) -->
+        <div id="fallback-banner" class="hidden my-4 text-sm text-red-800 bg-red-100 px-4 py-3 rounded-xl">
+            No data could be scraped — please fill in the fields manually.
+        </div>
+
+        <!-- Main form (hidden by default) -->
+        <form id="item-form" action="/add-item" method="POST" enctype="multipart/form-data"
+            class="space-y-5 bg-white p-6 rounded-2xl shadow mt-4 hidden">
+            <input type="hidden" name="product_url" id="product_url_hidden" />
+
+            <!-- Item name -->
+            <div>
+                <label for="name" class="block text-sm font-medium">Item Name *</label>
+                <input type="text" name="name" id="name" required
+                    class="mt-1 w-full rounded-xl border border-gray-300 shadow-sm focus:ring-black focus:border-black bg-white text-gray-800" />
+            </div>
+
+            <!-- Product Image -->
+            <div>
+                <label for="image_url" class="block text-sm font-medium">Image URL *</label>
+                <input type="url" name="image_url" id="image_url" required placeholder="https://example.com/image.jpg"
+                    class="mt-1 w-full rounded-xl border-gray-300 shadow-sm focus:ring-black focus:border-black">
+            
+                <!-- Preview -->
+                <div id="image-preview-container" class="mt-4 hidden">
+                    <p class="text-xs text-gray-500 mb-2">Preview:</p>
+                    <img id="image-preview" src="" alt="Image preview" class="max-w-full rounded-xl shadow">
+                </div>
+            </div>
+
+
+            <!-- Brand -->
+            <div>
+                <label for="brand_id" class="block text-sm font-medium">Brand</label>
+                <select name="brand_id" id="brand_id"
+                    class="mt-1 w-full rounded-xl border border-gray-300 shadow-sm focus:ring-black focus:border-black bg-white text-gray-800">
+                    {% for brand in brands %}
+                    <option value="{{ brand.id }}">{{ brand.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium">Description</label>
+                <textarea name="description" id="description" rows="3"
+                    class="mt-1 w-full rounded-xl border border-gray-300 shadow-sm focus:ring-black focus:border-black bg-white text-gray-800"></textarea>
+            </div>
+
+            <!-- Tags -->
+            <div>
+                <label for="tags" class="block text-sm font-medium">Tags (comma-separated)</label>
+                <input type="text" name="tags" id="tags"
+                    class="mt-1 w-full rounded-xl border border-gray-300 shadow-sm focus:ring-black focus:border-black bg-white text-gray-800" />
+            </div>
+
+            <!-- Wishlist -->
+            <div class="flex items-center">
+                <input type="checkbox" name="wishlist" id="wishlist"
+                    class="h-4 w-4 text-black border-gray-300 rounded" />
+                <label for="wishlist" class="ml-2 block text-sm text-gray-700">
+                    Wishlist (not yet owned)
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end">
+                <button type="submit" class="bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition">
+                    Save Item
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        async function scrapeProductInfo() {
+            const url = document.getElementById('product-url').value;
+            const fallbackBanner = document.getElementById('fallback-banner');
+            const form = document.getElementById('item-form');
+
+            if (!url) {
+                alert("Please enter a product URL");
+                return;
+            }
+
+            fallbackBanner.classList.add('hidden');
+
+            try {
+                const response = await fetch(`/scrape-item?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+
+                document.getElementById('product_url_hidden').value = url;
+
+                if (data.error) {
+                    fallbackBanner.classList.remove('hidden');
+                    form.classList.remove('hidden');
+                    form.scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('name').focus();
+                    return;
+                }
+
+                document.getElementById('name').value = data.name || "";
+                document.getElementById('description').value = data.description || "";
+                document.getElementById('tags').value = data.tags || "";
+
+                form.classList.remove('hidden');
+                form.scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                fallbackBanner.classList.remove('hidden');
+                form.classList.remove('hidden');
+                document.getElementById('name').focus();
+            }
+        }
+
+        const imageUrlInput = document.getElementById('image_url');
+            const preview = document.getElementById('image-preview');
+            const previewContainer = document.getElementById('image-preview-container');
+
+            imageUrlInput.addEventListener('input', () => {
+                const url = imageUrlInput.value.trim();
+                if (url && url.startsWith('http')) {
+                    preview.src = url;
+                    preview.onload = () => previewContainer.classList.remove('hidden');
+                    preview.onerror = () => previewContainer.classList.add('hidden');
+                } else {
+                    previewContainer.classList.add('hidden');
+                }
+            });
+
+    </script>
+</body>
+
+</html>

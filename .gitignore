@@ -1,0 +1,4 @@
+.env
+venv/
+website/__pycache__/
+instance/

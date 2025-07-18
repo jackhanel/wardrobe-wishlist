@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Clothing Items</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Optional simple filtering script (replace if filtering is server-side)
+        function filterCategory(category) {
+            document.querySelectorAll('[data-category]').forEach(card => {
+                card.style.display = category === 'All' || card.dataset.category === category ? 'block' : 'none';
+            });
+        }
+    </script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold">My Items</h1>
+            <a href="/add-item" class="bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition">
+                + Add Item
+            </a>
+        </div>
+
+        <!-- Category pills -->
+        <div class="flex overflow-x-auto space-x-3 mb-6 pb-2">
+            <button onclick="filterCategory('All')"
+                class="shrink-0 px-4 py-1.5 rounded-full bg-black text-white text-sm">All</button>
+            {% for category in categories %}
+            <button onclick="filterCategory('{{ category }}')"
+                class="shrink-0 px-4 py-1.5 rounded-full bg-gray-200 hover:bg-gray-300 text-sm">
+                {{ category }}
+            </button>
+            {% endfor %}
+        </div>
+
+        <!-- Items grid -->
+        {% if items %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% for item in items %}
+            <div data-category="{{ item.category }}" class="bg-white rounded-2xl shadow p-4 flex flex-col">
+                <img src="{{ item.image_url or url_for('static', filename='default-item.png') }}" alt="{{ item.name }}"
+                    class="h-48 object-cover rounded-lg mb-3">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h2 class="text-lg font-semibold">{{ item.name }}</h2>
+                        <p class="text-sm text-gray-500">{{ item.brand_name }}</p>
+                    </div>
+                    {% if item.wishlist %}
+                    <span class="text-xs text-white bg-yellow-500 rounded-full px-2 py-0.5">Wishlist</span>
+                    {% endif %}
+                </div>
+                {% if item.tags %}
+                <p class="mt-2 text-sm text-gray-600">{{ item.tags|join(', ') }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center text-gray-500">No items added yet.</p>
+        {% endif %}
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Favorite Brands</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold">My Favorite Brands</h1>
+            <a href="/add-brand" class="bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition">
+                + Add Brand
+            </a>
+        </div>
+
+        {% if brands %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% for brand in brands %}
+            <div class="bg-white rounded-2xl shadow p-4 flex flex-col items-center">
+                <img src="{{ brand.image_url or url_for('static', filename='default-brand.png') }}"
+                    alt="{{ brand.name }}" class="h-24 w-24 object-contain mb-4">
+                <h2 class="text-lg font-semibold text-center">{{ brand.name }}</h2>
+                <p class="text-sm text-gray-600 text-center mt-1">{{ brand.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center text-gray-500">You haven’t added any brands yet.</p>
+        {% endif %}
+    </div>
+</body>
+
+</html>
