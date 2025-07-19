@@ -41,22 +41,38 @@
         {% if items %}
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {% for item in items %}
-            <div data-category="{{ item.category }}" class="bg-white rounded-2xl shadow p-4 flex flex-col">
-                <img src="{{ item.image_url or url_for('static', filename='default-item.png') }}" alt="{{ item.name }}"
-                    class="h-48 object-cover rounded-lg mb-3">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h2 class="text-lg font-semibold">{{ item.name }}</h2>
-                        <p class="text-sm text-gray-500">{{ item.brand_name }}</p>
+            <a href="{{ item.product_url }}" target="_blank" class="block hover:shadow-lg transition">
+                <div class="bg-white rounded-2xl shadow hover:shadow-lg p-4 relative group">
+                    <!-- Delete Button (only on hover) -->
+                    <form action="/delete-item/{{ item.id }}" method="POST"
+                        class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
+                        <button type="submit" title="Delete" class="text-gray-400 hover:text-red-500 text-lg">
+                            🗑
+                        </button>
+                    </form>
+
+                    <!-- Image -->
+                    <div class="w-full h-48 flex items-center justify-center overflow-hidden mb-3">
+                        <img src="{{ item.image_url }}" alt="{{ item.name }}" class="object-contain h-full w-full">
                     </div>
-                    {% if item.wishlist %}
-                    <span class="text-xs text-white bg-yellow-500 rounded-full px-2 py-0.5">Wishlist</span>
+
+                    <!-- Name + Brand -->
+                    <div class="text-center">
+                        <h2 class="text-base font-semibold text-gray-900">{{ item.name }}</h2>
+                        {% if item.brand %}
+                        <p class="text-sm text-gray-500 mt-1">{{ item.brand.name }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Tags -->
+                    {% if item.tags %}
+                    <p class="mt-2 text-xs text-gray-400 text-center truncate">
+                        Tags: {{ item.tags }}
+                    </p>
                     {% endif %}
                 </div>
-                {% if item.tags %}
-                <p class="mt-2 text-sm text-gray-600">{{ item.tags|join(', ') }}</p>
-                {% endif %}
-            </div>
+            </a>
+
             {% endfor %}
         </div>
         {% else %}

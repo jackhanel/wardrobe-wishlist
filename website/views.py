@@ -52,24 +52,23 @@ def addItem():
 
     if request.method == "POST":
         name = request.form.get("name")
-        brand_id = request.form.get("brand_id")
+        product_url = request.form.get("product_url")
         image_url = request.form.get("image_url")
-        description = request.form.get("description")
         tags = request.form.get("tags")
-        wishlist = bool(request.form.get("wishlist"))
+        brand_name = request.form.get("brand_name", "").strip()
 
-        # Derive category (basic example — you can improve later)
-        # category = deriveCategory(name, tags, description)
-        category = "test"
+        brand = Brand.query.filter_by(name=brand_name).first()
+        if not brand:
+            brand = Brand(name=brand_name)
+            db.session.add(brand)
+            db.session.commit()
 
         new_item = Item(
             name=name,
+            product_url=product_url,
             image_url=image_url,
-            description=description,
+            brand_id=brand.id,
             tags=tags,
-            category=category,
-            wishlist=wishlist,
-            brand_id=brand_id,
         )
 
         db.session.add(new_item)
@@ -139,3 +138,11 @@ def scrapeItem():
     except Exception as e:
         print(f"Scrape error: {e}")
         return jsonify({"error": "Failed to scrape product info"}), 500
+
+
+@views.route("/delete-item/<int:item_id>", methods=["POST"])
+def delete_item(item_id):
+    item = Item.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    return redirect(url_for("views.items"))

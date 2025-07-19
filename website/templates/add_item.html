@@ -47,7 +47,7 @@
             <!-- Product Image -->
             <div>
                 <label for="image_url" class="block text-sm font-medium">Image URL *</label>
-                <input type="url" name="image_url" id="image_url" required placeholder="https://example.com/image.jpg"
+                <input type="url" name="image_url" id="image_url" required
                     class="mt-1 w-full rounded-xl border-gray-300 shadow-sm focus:ring-black focus:border-black">
             
                 <!-- Preview -->
@@ -57,23 +57,22 @@
                 </div>
             </div>
 
-
             <!-- Brand -->
             <div>
-                <label for="brand_id" class="block text-sm font-medium">Brand</label>
-                <select name="brand_id" id="brand_id"
-                    class="mt-1 w-full rounded-xl border border-gray-300 shadow-sm focus:ring-black focus:border-black bg-white text-gray-800">
+                <label for="brand_select" class="block text-sm font-medium">Brand</label>
+                <select id="brand_select"
+                    class="mt-1 w-full rounded-xl border-gray-300 shadow-sm focus:ring-black focus:border-black">
+                    <option value="">-- Select an existing brand --</option>
                     {% for brand in brands %}
-                    <option value="{{ brand.id }}">{{ brand.name }}</option>
+                    <option value="{{ brand.name }}">{{ brand.name }}</option>
                     {% endfor %}
                 </select>
             </div>
-
-            <!-- Description -->
-            <div>
-                <label for="description" class="block text-sm font-medium">Description</label>
-                <textarea name="description" id="description" rows="3"
-                    class="mt-1 w-full rounded-xl border border-gray-300 shadow-sm focus:ring-black focus:border-black bg-white text-gray-800"></textarea>
+            
+            <div class="mt-4">
+                <label for="brand_name" class="block text-sm font-medium">Or add a new brand</label>
+                <input type="text" name="brand_name" id="brand_name" placeholder="e.g. A Kind of Guise"
+                    class="mt-1 w-full rounded-xl border-gray-300 shadow-sm focus:ring-black focus:border-black">
             </div>
 
             <!-- Tags -->
@@ -81,15 +80,6 @@
                 <label for="tags" class="block text-sm font-medium">Tags (comma-separated)</label>
                 <input type="text" name="tags" id="tags"
                     class="mt-1 w-full rounded-xl border border-gray-300 shadow-sm focus:ring-black focus:border-black bg-white text-gray-800" />
-            </div>
-
-            <!-- Wishlist -->
-            <div class="flex items-center">
-                <input type="checkbox" name="wishlist" id="wishlist"
-                    class="h-4 w-4 text-black border-gray-300 rounded" />
-                <label for="wishlist" class="ml-2 block text-sm text-gray-700">
-                    Wishlist (not yet owned)
-                </label>
             </div>
 
             <!-- Submit Button -->
@@ -156,6 +146,14 @@
                     previewContainer.classList.add('hidden');
                 }
             });
+
+        const brandSelect = document.getElementById('brand_select');
+            const brandInput = document.getElementById('brand_name');
+
+            brandSelect.addEventListener('change', () => {
+                brandInput.value = brandSelect.value;  // Copy selection into text input
+            });
+
 
     </script>
 </body>
