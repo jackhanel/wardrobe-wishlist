@@ -14,7 +14,8 @@ def home():
 
 @views.route("/brands")
 def brands():
-    return render_template("brands.html")
+    brands = Brand.query.all()
+    return render_template("brands.html", brands=brands)
 
 
 @views.route("/add-brand", methods=["GET", "POST"])
@@ -48,7 +49,7 @@ def items():
 
 @views.route("/add-item", methods=["GET", "POST"])
 def addItem():
-    # brands = Brand.query.order_by(Brand.name).all()
+    brands = Brand.query.order_by(Brand.name).all()
 
     if request.method == "POST":
         name = request.form.get("name")
@@ -76,8 +77,8 @@ def addItem():
 
         return redirect(url_for("views.items"))
 
-    # return render_template("add_item.html", brands=brands)
-    return render_template("add_item.html")
+    return render_template("add_item.html", brands=brands)
+    
 
 
 @views.route("/scrape-item")
