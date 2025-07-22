@@ -78,7 +78,23 @@ def addItem():
         return redirect(url_for("views.items"))
 
     return render_template("add_item.html", brands=brands)
-    
+
+
+@views.route("/edit-item/<int:item_id>", methods=["GET", "POST"])
+def edit_item(item_id):
+    item = db.session.get(Item, item_id)  # or Item.query.get(item_id) if using SQLAlchemy <2.0
+    if not item:
+        return "Item not found", 404
+
+    if request.method == "POST":
+        item.name = request.form["name"]
+        item.image_url = request.form["image_url"]
+        item.product_url = request.form["product_url"]
+        item.tags = request.form.get("tags") or None
+        db.session.commit()
+        return redirect("/items")  # adjust if your items route is named differently
+
+    return render_template("edit_item.html", item=item)
 
 
 @views.route("/scrape-item")
