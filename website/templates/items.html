@@ -44,37 +44,46 @@
         {% if items %}
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {% for item in items %}
-            <a href="{{ item.product_url }}" target="_blank" class="block transition">
-                <div class="bg-white rounded-2xl shadow hover:shadow-lg p-4 relative group flex flex-col justify-between w-72 h-72">
-                    <!-- Delete Button (only on hover) -->
-                    <form action="/delete-item/{{ item.id }}" method="POST"
-                        class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
-                        <button type="submit" title="Delete" class="text-gray-400 hover:text-red-500 text-lg">
-                            ⛔️
-                        </button>
-                    </form>
-
-                    <!-- Image -->
-                    <div class="w-full h-48 flex items-center justify-center overflow-hidden mb-3">
-                        <img src="{{ item.image_url }}" alt="{{ item.name }}" class="object-contain h-full w-full">
-                    </div>
-
-                    <!-- Name + Brand -->
-                    <div class="text-center">
-                        <h2 class="text-base font-semibold text-gray-900">{{ item.name }}</h2>
-                        {% if item.brand %}
-                        <p class="text-sm text-gray-500 mt-1">{{ item.brand.name }}</p>
+            <div class="relative group">
+                <!-- Edit Button -->
+                <a href="/edit-item/{{ item.id }}" title="Edit"
+                    class="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition text-gray-400 hover:text-blue-500 hover:bg-gray-200 rounded-md text-lg z-10 p-1">
+                    🔧
+                </a>
+            
+                <a href="{{ item.product_url }}" target="_blank" class="block transition">
+                    <div class="bg-white rounded-2xl shadow hover:shadow-lg p-4 relative flex flex-col justify-between w-72 h-72">
+                        <!-- Delete Button -->
+                        <form action="/delete-item/{{ item.id }}" method="POST"
+                            class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
+                            <button type="submit" title="Delete"
+                                class="text-gray-400 hover:text-red-500 hover:bg-gray-200 rounded-md text-lg p-1">
+                                ⛔️
+                            </button>
+                        </form>
+            
+                        <!-- Image -->
+                        <div class="w-full h-48 flex items-center justify-center overflow-hidden mb-3">
+                            <img src="{{ item.image_url }}" alt="{{ item.name }}" class="object-contain h-full w-full">
+                        </div>
+            
+                        <!-- Name + Brand -->
+                        <div class="text-center">
+                            <h2 class="text-base font-semibold text-gray-900">{{ item.name }}</h2>
+                            {% if item.brand %}
+                            <p class="text-sm text-gray-500 mt-1">{{ item.brand.name }}</p>
+                            {% endif %}
+                        </div>
+            
+                        <!-- Tags -->
+                        {% if item.tags %}
+                        <p class="mt-2 text-xs text-gray-400 text-center truncate">
+                            Tags: {{ item.tags }}
+                        </p>
                         {% endif %}
                     </div>
-
-                    <!-- Tags -->
-                    {% if item.tags %}
-                    <p class="mt-2 text-xs text-gray-400 text-center truncate">
-                        Tags: {{ item.tags }}
-                    </p>
-                    {% endif %}
-                </div>
-            </a>
+                </a>
+            </div>
 
             {% endfor %}
         </div>
