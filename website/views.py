@@ -41,6 +41,33 @@ def addBrand():
     return render_template("add_brand.html")
 
 
+@views.route("/edit-brand/<int:brand_id>", methods=["GET", "POST"])
+def edit_brand(brand_id):
+    brand = db.session.get(Brand, brand_id)
+    if not brand:
+        return "Brand not found", 404
+
+    if request.method == "POST":
+        brand.name = request.form["name"]
+        brand.image_url = request.form.get("image_url") or None
+        brand.description = request.form.get("description") or None
+        db.session.commit()
+        return redirect("/brands")
+
+    return render_template("edit_brand.html", brand=brand)
+
+
+@views.route("/delete-brand/<int:brand_id>", methods=["POST"])
+def delete_brand(brand_id):
+    brand = db.session.get(Brand, brand_id)
+    if not brand:
+        return "Brand not found", 404
+
+    db.session.delete(brand)
+    db.session.commit()
+    return redirect("/brands")
+
+
 @views.route("/items")
 def items():
     items = Item.query.all()
@@ -95,6 +122,14 @@ def edit_item(item_id):
         return redirect("/items")  # adjust if your items route is named differently
 
     return render_template("edit_item.html", item=item)
+
+
+@views.route("/delete-item/<int:item_id>", methods=["POST"])
+def delete_item(item_id):
+    item = Item.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    return redirect(url_for("views.items"))
 
 
 @views.route("/scrape-item")
@@ -155,11 +190,3 @@ def scrapeItem():
     except Exception as e:
         print(f"Scrape error: {e}")
         return jsonify({"error": "Failed to scrape product info"}), 500
-
-
-@views.route("/delete-item/<int:item_id>", methods=["POST"])
-def delete_item(item_id):
-    item = Item.query.get_or_404(item_id)
-    db.session.delete(item)
-    db.session.commit()
-    return redirect(url_for("views.items"))

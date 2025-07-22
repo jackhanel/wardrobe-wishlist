@@ -13,7 +13,7 @@ class Brand(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
 
     # One-to-many relationship
-    items = db.relationship("Item", backref="brand", lazy=True)
+    items = db.relationship("Item", backref="brand", lazy=True, cascade="all, delete-orphan")
 
 
 class Item(db.Model):
