@@ -14,7 +14,7 @@ def login():
 @auth.route("/callback")
 def callback():
     token = oauth.auth0.authorize_access_token()
-    userinfo = oauth.auth0.get("userinfo").json()
+    userinfo = oauth.auth0.userinfo()
     session["user"] = {
         "name": userinfo["name"],
         "email": userinfo["email"],
@@ -27,5 +27,5 @@ def callback():
 def logout():
     session.clear()
     return redirect(
-        f"https://{os.getenv('AUTH0_DOMAIN')}/v2/logout?returnTo=http://localhost:5000&client_id={os.getenv('AUTH0_CLIENT_ID')}"
+        f"https://{os.getenv('AUTH0_DOMAIN')}/v2/logout?returnTo=http://127.0.0.1:5000&client_id={os.getenv('AUTH0_CLIENT_ID')}"
     )

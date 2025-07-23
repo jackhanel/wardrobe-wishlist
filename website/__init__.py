@@ -5,6 +5,7 @@ import os
 from authlib.integrations.flask_client import OAuth
 
 db = SQLAlchemy()
+oauth = OAuth()
 
 
 def create_app():
@@ -16,15 +17,14 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
-    oauth = OAuth(app)
+    oauth.init_app(app)
+
     auth0 = oauth.register(
-        'auth0',
+        "auth0",
         client_id=os.getenv("AUTH0_CLIENT_ID"),
         client_secret=os.getenv("AUTH0_CLIENT_SECRET"),
-        api_base_url=f"https://{os.getenv('AUTH0_DOMAIN')}",
-        access_token_url=f"https://{os.getenv('AUTH0_DOMAIN')}/oauth/token",
-        authorize_url=f"https://{os.getenv('AUTH0_DOMAIN')}/authorize",
-        client_kwargs={'scope': 'openid profile email'},
+        client_kwargs={"scope": "openid profile email"},
+        server_metadata_url=f'https://{os.getenv("AUTH0_DOMAIN")}/.well-known/openid-configuration',
     )
 
     from .views import views
