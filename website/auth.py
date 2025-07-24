@@ -1,6 +1,7 @@
 from flask import Blueprint, session, redirect
 from authlib.integrations.flask_client import OAuth
-from . import oauth
+from . import oauth, db
+from .models import User
 import os
 
 auth = Blueprint("auth", __name__)
@@ -15,11 +16,21 @@ def login():
 def callback():
     token = oauth.auth0.authorize_access_token()
     userinfo = oauth.auth0.userinfo()
+
+    auth0_id = userinfo["sub"]
+    user = User.query.filter_by(auth0_id=auth0_id).first()
+    if not user:
+        user = User(auth0_id=auth0_id, email=userinfo["email"], name=userinfo["name"])
+        db.session.add(user)
+        db.session.commit()
+
     session["user"] = {
-        "name": userinfo["name"],
-        "email": userinfo["email"],
-        "picture": userinfo["picture"],
+        "id": user.id,
+        "auth0_id": auth0_id,
+        "name": user.name,
+        "email": user.email,
     }
+
     return redirect("/")
 
 

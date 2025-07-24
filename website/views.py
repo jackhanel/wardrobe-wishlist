@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, session
 import requests
 from bs4 import BeautifulSoup
-from . import db
+from . import db, login_required
 from .models import Brand, Item
 
 views = Blueprint("views", __name__)
@@ -13,12 +13,14 @@ def home():
 
 
 @views.route("/brands")
+@login_required
 def brands():
-    brands = Brand.query.all()
+    brands = Brand.query.filter_by(user_id=session["user"]["id"]).all()
     return render_template("brands.html", brands=brands)
 
 
 @views.route("/add-brand", methods=["GET", "POST"])
+@login_required
 def addBrand():
     if request.method == "POST":
         name = request.form.get("name")
@@ -31,6 +33,7 @@ def addBrand():
             homepage_url=homepage_url,
             image_url=image_url,
             description=description,
+            user_id=session["user"]["id"],
         )
 
         db.session.add(new_brand)
@@ -42,6 +45,7 @@ def addBrand():
 
 
 @views.route("/edit-brand/<int:brand_id>", methods=["GET", "POST"])
+@login_required
 def edit_brand(brand_id):
     brand = db.session.get(Brand, brand_id)
     if not brand:
@@ -58,6 +62,7 @@ def edit_brand(brand_id):
 
 
 @views.route("/delete-brand/<int:brand_id>", methods=["POST"])
+@login_required
 def delete_brand(brand_id):
     brand = db.session.get(Brand, brand_id)
     if not brand:
@@ -69,14 +74,17 @@ def delete_brand(brand_id):
 
 
 @views.route("/items")
+@login_required
 def items():
-    items = Item.query.all()
+    items = Item.query.filter_by(user_id=session["user"]["id"]).all()
     return render_template("items.html", items=items)
 
 
 @views.route("/add-item", methods=["GET", "POST"])
+@login_required
 def addItem():
-    brands = Brand.query.order_by(Brand.name).all()
+    brands = Brand.query.filter_by(user_id=session["user"]["id"]).order_by(Brand.name).all()
+
 
     if request.method == "POST":
         name = request.form.get("name")
@@ -85,9 +93,9 @@ def addItem():
         tags = request.form.get("tags")
         brand_name = request.form.get("brand_name", "").strip()
 
-        brand = Brand.query.filter_by(name=brand_name).first()
+        brand = Brand.query.filter_by(name=brand_name, user_id=session["user"]["id"]).first()
         if not brand:
-            brand = Brand(name=brand_name)
+            brand = Brand(name=brand_name, user_id=session["user"]["id"])
             db.session.add(brand)
             db.session.commit()
 
@@ -97,6 +105,7 @@ def addItem():
             image_url=image_url,
             brand_id=brand.id,
             tags=tags,
+            user_id=session["user"]["id"],
         )
 
         db.session.add(new_item)
@@ -108,8 +117,9 @@ def addItem():
 
 
 @views.route("/edit-item/<int:item_id>", methods=["GET", "POST"])
+@login_required
 def edit_item(item_id):
-    item = db.session.get(Item, item_id)  # or Item.query.get(item_id) if using SQLAlchemy <2.0
+    item = Item.query.filter_by(id=item_id, user_id=session["user"]["id"]).first_or_404()
     if not item:
         return "Item not found", 404
 
@@ -125,14 +135,16 @@ def edit_item(item_id):
 
 
 @views.route("/delete-item/<int:item_id>", methods=["POST"])
+@login_required
 def delete_item(item_id):
-    item = Item.query.get_or_404(item_id)
+    item = Item.query.filter_by(id=item_id, user_id=session["user"]["id"]).first_or_404()
     db.session.delete(item)
     db.session.commit()
     return redirect(url_for("views.items"))
 
 
 @views.route("/scrape-item")
+@login_required
 def scrapeItem():
     from flask import request, jsonify
     import requests

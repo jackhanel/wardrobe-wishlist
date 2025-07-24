@@ -1,11 +1,22 @@
-from flask import Flask
+from flask import Flask, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
 from authlib.integrations.flask_client import OAuth
+from functools import wraps
 
 db = SQLAlchemy()
 oauth = OAuth()
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user" not in session:
+            return redirect(url_for("auth.login"))
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 def create_app():
