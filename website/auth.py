@@ -38,5 +38,5 @@ def callback():
 def logout():
     session.clear()
     return redirect(
-        f"https://{os.getenv('AUTH0_DOMAIN')}/v2/logout?returnTo=http://127.0.0.1:5000&client_id={os.getenv('AUTH0_CLIENT_ID')}"
+        f"https://{os.getenv('AUTH0_DOMAIN')}/v2/logout?returnTo=https://wardrobe-wishlist.onrender.com&client_id={os.getenv('AUTH0_CLIENT_ID')}"
     )
