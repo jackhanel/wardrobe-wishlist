@@ -62,12 +62,9 @@
                             </button>
                         </form>
                 
-                        <!-- Card content -->
-                        <div class="bg-white rounded-2xl shadow p-4 flex flex-col items-center h-48">
-                            <img src="{{ brand.image_url or url_for('static', filename='default-brand.png') }}" alt="{{ brand.name }}"
-                                class="h-24 w-24 object-contain mb-4">
-                            <h2 class="text-lg font-semibold text-center">{{ brand.name }}</h2>
-                        </div>
+                        <img src="{{ brand.image_url or url_for('static', filename='default-brand.png') }}" alt="{{ brand.name }}"
+                            class="h-24 w-24 object-contain mb-4">
+                        <h2 class="text-lg font-semibold text-center">{{ brand.name }}</h2>
                     </div>
                 </a>
             </div>
