@@ -40,21 +40,22 @@
             </a>
         </div>
 
+        <!-- Brands Grid -->
         {% if brands %}
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {% for brand in brands %}
             <div class="relative group">
-                <!-- Edit Button (top-left) -->
+                <!-- Edit Button -->
                 <a href="/edit-brand/{{ brand.id }}" title="Edit"
                     class="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition text-gray-400 hover:text-blue-500 hover:bg-gray-200 rounded-md text-lg z-10 p-1">
                     🔧
                 </a>
         
                 <a href="{{ brand.homepage_url }}" target="_blank" class="block transition">
-                    <div class="bg-white rounded-2xl shadow hover:shadow-lg p-4 relative flex flex-col justify-between w-72 h-72">
-                        <!-- Delete Button (top-right) -->
+                    <div class="bg-white rounded-2xl shadow hover:shadow-lg p-4 relative flex flex-col justify-between h-72">
+                        <!-- Delete Button -->
                         <form action="/delete-brand/{{ brand.id }}" method="POST"
-                            class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition z-10"
+                            class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition"
                             onsubmit="return confirm('Are you sure you want to delete this brand? All associated items will also be deleted.');">
                             <button type="submit" title="Delete"
                                 class="text-gray-400 hover:text-red-500 hover:bg-gray-200 rounded-md text-lg p-1">
@@ -62,21 +63,23 @@
                             </button>
                         </form>
                 
+                        <!-- Image -->
                         <div class="w-full h-48 flex items-center justify-center overflow-hidden mb-3">
                             <img src="{{ brand.image_url }}" alt="{{ brand.name }}" class="object-contain h-full w-full">
                         </div>
 
+                        <!-- Name -->
                         <div class="text-center">
                             <h2 class="text-base font-semibold text-gray-900">{{ brand.name }}</h2>
                         </div>
-
                     </div>
                 </a>
             </div>
+
             {% endfor %}
         </div>
         {% else %}
-        <p class="text-center text-gray-500">You haven’t added any brands yet.</p>
+        <p class="text-center text-gray-500">No brands added yet.</p>
         {% endif %}
     </div>
 </body>
