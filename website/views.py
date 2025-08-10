@@ -47,7 +47,7 @@ def addBrand():
 @views.route("/edit-brand/<int:brand_id>", methods=["GET", "POST"])
 @login_required
 def edit_brand(brand_id):
-    brand = db.session.get(Brand, brand_id)
+    brand = Brand.query.filter_by(id=brand_id, user_id=session["user"]["id"]).first_or_404()
     if not brand:
         return "Brand not found", 404
 
@@ -64,7 +64,7 @@ def edit_brand(brand_id):
 @views.route("/delete-brand/<int:brand_id>", methods=["POST"])
 @login_required
 def delete_brand(brand_id):
-    brand = db.session.get(Brand, brand_id)
+    brand = Brand.query.filter_by(id=brand_id, user_id=session["user"]["id"]).first_or_404()
     if not brand:
         return "Brand not found", 404
 
